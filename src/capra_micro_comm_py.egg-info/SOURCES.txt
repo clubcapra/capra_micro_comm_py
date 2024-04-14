@@ -1,0 +1,10 @@
+LICENSE
+ReadMe.md
+pyproject.toml
+src/capra_micro_comm_py/__init__.py
+src/capra_micro_comm_py/test_api.py
+src/capra_micro_comm_py.egg-info/PKG-INFO
+src/capra_micro_comm_py.egg-info/SOURCES.txt
+src/capra_micro_comm_py.egg-info/dependency_links.txt
+src/capra_micro_comm_py.egg-info/top_level.txt
+tests/test_build.py

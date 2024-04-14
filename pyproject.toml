@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "capra_micro_comm"
+name = "capra_micro_comm_py"
 version = "0.0.1"
 authors = [
   { name="CAPRA", email="capra@ens.etsmtl.ca" },
@@ -19,8 +19,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/clubcapra/capra_micro_comm"
-Issues = "https://github.com/clubcapra/capra_micro_comm/issues"
+Homepage = "https://github.com/clubcapra/capra_micro_comm_py"
+Issues = "https://github.com/clubcapra/capra_micro_comm_py/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
