@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "capra_micro_comm"
+version = "0.0.1"
+authors = [
+  { name="CAPRA", email="capra@ens.etsmtl.ca" },
+]
+description = "A lightweight and framework independant rpc library."
+readme = "ReadMe.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/clubcapra/capra_micro_comm"
+Issues = "https://github.com/clubcapra/capra_micro_comm/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["*"]
+# namespaces = false  # true by default
+[tool.setuptools.package-data]
+mypkg = ["*.h"]
