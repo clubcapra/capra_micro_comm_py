@@ -27,4 +27,4 @@ where = ["src"]
 include = ["*"]
 # namespaces = false  # true by default
 [tool.setuptools.package-data]
-mypkg = ["*.h"]
+capra_micro_comm_py = ["*.h"]
