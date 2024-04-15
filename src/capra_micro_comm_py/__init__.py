@@ -343,7 +343,7 @@ class CommandManager:
             res += v.parseCls() + '\n\n'
             maxSize = max(maxSize, len(v))
         
-        lst = "BaseFunction_ptr commands[] = {\n"
+        lst = "static BaseFunction_ptr commands[] = {\n"
         res += "// --- COMMANDS ---\n"
         for cmd in self._commands:
             res += cmd.parse() + '\n'
