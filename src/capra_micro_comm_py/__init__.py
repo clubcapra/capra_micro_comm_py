@@ -304,7 +304,7 @@ class CommandManager:
     def enum(self, fmt:str = 'I'):
         def pred(cls:E):
             def parse():
-                s = f'enum class {cls.__name__} : {TYPE_MAP[fmt]}\n'
+                s = f'enum {cls.__name__} : {TYPE_MAP[fmt]}\n'
                 s += '{\n'
                 for k, v in cls.__members__.items():
                     s += f'    {k} = {v.value},\n'
