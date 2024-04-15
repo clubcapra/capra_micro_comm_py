@@ -331,10 +331,10 @@ class CommandManager:
         if test:
             res += "#include \"common.h\""
         else:
-            res += "#include <capra_comm.h>"
+            res += "#include <capra_comm.h>\n\n"
             
-        # for e in self._enums:
-        #     res += e.parse() + '\n\n'
+        for e in self._enums:
+            res += e.parse() + '\n\n'
             
         res += "\n\n\n// --- STRUCTS ---\n"
         maxSize = 0
