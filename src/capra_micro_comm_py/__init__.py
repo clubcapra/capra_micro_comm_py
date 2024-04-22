@@ -398,8 +398,8 @@ class CommandManager:
         encoded = base64.encodebytes(bytes(range(maxSize+1)))
         res += f"#define MAX_ENCODED_SIZE {len(encoded)}\n"
         
-        h = hashlib.sha1(res, usedforsecurity=False)
-        l = int.from_bytes(h.digest()) % 2**64
+        h = hashlib.sha1(res.encode(), usedforsecurity=False)
+        l = int.from_bytes(h.digest(), 'little') % 2**64
         res += f'#define API_HASH {l}UL'
         
         return res, l
@@ -424,7 +424,7 @@ class CommandManager:
         return res
         
     def testAPI(self, outputDir:Path):
-        api = self.generateAPI(True)
+        api, _ = self.generateAPI(True)
         test = self.generateTestAPI()
         outputDir.mkdir(parents=True, exist_ok=True)
         src = outputDir / 'src'

@@ -5,7 +5,7 @@ import src.capra_micro_comm_py as ucomm
 
 def test_baseAPI():
     manager = ucomm.CommandManager()
-    api = manager.generateAPI()
+    api, _ = manager.generateAPI()
     for s in manager._structs:
         inst = s()
         assert api.find(s.__name__) != -1
@@ -62,7 +62,7 @@ def test_commands():
         pass
 
     
-    api = manager.generateAPI()
+    api, _ = manager.generateAPI()
     for c in manager._commands:
         found = False
         c:ucomm.CommandHook[ucomm.BinaryData, ucomm.BinaryData]
