@@ -369,7 +369,7 @@ class CommandManager:
             
             """)
         if test:
-            res += "#include \"common.h\""
+            res += "#include \"common.h\"\n"
         else:
             res += "#include <capra_comm.h>\n\n"
             
