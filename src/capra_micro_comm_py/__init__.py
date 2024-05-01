@@ -35,6 +35,23 @@ TYPE_MAP = {
     'f' : 'efloat_t',
 }
 
+CAST_MAP = {
+    'x' : int,
+    'c' : int,
+    'b' : int,
+    'B' : int,
+    '?' : bool,
+    'h' : int,
+    'H' : int,
+    'i' : int,
+    'I' : int,
+    'l' : int,
+    'L' : int,
+    'q' : int,
+    'Q' : int,
+    'f' : float,
+}
+
 SIZE_MAP = {
     'x' : 1,
     'c' : 1,
@@ -116,8 +133,11 @@ class BinaryData:
     @property
     def values(self):
         v = []
-        for k in self._keys:
-            v.append(self.__dict__[k])
+        for f, k in zip(self.__class__._ofmt, self._keys):
+            if f == '_':
+                v.append(self.__dict__[k])
+            else:
+                v.append(CAST_MAP[f](self.__dict__[k]))
         
         return v
 
@@ -186,20 +206,22 @@ class CommandHook(Generic[P, R]):
             # Send data
             stream.write(param)
             
-            # Call base call
-            cb(self._call, p)
-            
+        # Call base call
+        cb(self._call, p)
+        
+        with self.parent as stream:
             # Read data
-            if self.returnType != Void:
-                res = stream.read(len(self.returnType()))
-                # print(bin(int.from_bytes(res, 'little')))
+            res = stream.read(len(self.returnType()))
         
         # Handle Void return
         r = None
         if self.returnType != Void:
             # Decode data if not Void
             r = self.returnType()
-            r.unpack(res)
+            try:
+                r.unpack(res)
+            except:
+                pass
         
         # Call post call if provided
         if self._post_call:
@@ -311,7 +333,7 @@ class CommandManager:
         self._pingcmd = ping
         
         @self.command(Void, ULong)
-        def hashCheck(_:Void) -> ULong:
+        def hashCheck() -> ULong:
             pass
         self._hashCheck = hashCheck
         
@@ -326,7 +348,7 @@ class CommandManager:
     
     def apiCheck(self):
         _, h = self.generateAPI()
-        hh = self._hashCheck(Void())
+        hh = self._hashCheck()
         return h == hh.l
     
     def command(self, paramType:Type[P], returnType:Type[R]):
