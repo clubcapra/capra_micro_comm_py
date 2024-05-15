@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: capra_micro_comm_py
-Version: 1.1.0
+Version: 1.2.0
 Summary: A lightweight and framework independant rpc library.
 Author-email: CAPRA <capra@ens.etsmtl.ca>
 Project-URL: Homepage, https://github.com/clubcapra/capra_micro_comm_py

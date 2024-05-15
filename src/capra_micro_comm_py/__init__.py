@@ -1,6 +1,7 @@
 from __future__ import annotations
+import asyncio
+from asyncio import iscoroutinefunction
 import base64
-from ctypes import ArgumentError
 from enum import Enum
 import functools
 import hashlib
@@ -12,7 +13,7 @@ from random import randint
 import struct
 from textwrap import dedent
 import time
-from typing import Callable, ForwardRef, Generic, List, NoReturn, Tuple, Type, TypeVar, Union, ClassVar
+from typing import Callable, Coroutine, ForwardRef, Generic, List, NoReturn, Tuple, Type, TypeVar, Union, ClassVar, overload
 
 from serial import Serial
 
@@ -140,6 +141,16 @@ class BinaryData:
                 v.append(CAST_MAP[f](self.__dict__[k]))
         
         return v
+    
+    def pack(self):
+        v = []
+        for f, k in zip(self.__class__._ofmt, self._keys):
+            if f == '_':
+                v.extend(self.__dict__[k].values)
+            else:
+                v.append(CAST_MAP[f](self.__dict__[k]))
+        
+        return v
 
     def __len__(self):
         return struct.calcsize(self._fmt)
@@ -199,7 +210,7 @@ class CommandHook(Generic[P, R]):
             cb(self._pre_call, p)
         
         # Encode data
-        param = struct.pack('<B'+p._fmt, self.id, *p.values)
+        param = struct.pack('<B'+p._fmt, self.id, *p.pack())
         # print(param)
         with self.parent as stream:
             stream:RawIOBase
@@ -229,6 +240,70 @@ class CommandHook(Generic[P, R]):
                 self._post_call()
             else:
                 self._post_call(r)
+        return r
+    
+    async def callAsync(self, p:P=None) -> R:
+        await self.parent.lock.acquire()
+        # Handle Void parameter
+        if self.paramType == Void:
+            cb = lambda c, pp: c()
+            p = Void()
+        else:
+            cb = lambda c, pp: c(pp)
+        
+        # Call pre call if provided
+        if self._pre_call:
+            cb(self._pre_call, p)
+        
+        # Encode data
+        param = struct.pack('<B'+p._fmt, self.id, *p.values)
+        # print(param)
+        with self.parent as stream:
+            # Send data
+            if hasattr(stream, 'writeAsync'):
+                await stream.writeAsync(param)
+            elif iscoroutinefunction(stream.write):
+                await stream.write(param)
+            else:
+                await asyncio.to_thread(stream.write, param)
+                
+            if hasattr(stream, 'flushAsync'):
+                await stream.flushAsync()
+            elif iscoroutinefunction(stream.flush):
+                await stream.flush()
+            else:
+                await asyncio.to_thread(stream.flush)
+
+            
+        # Call base call
+        cb(self._call, p)
+        
+        with self.parent as stream:
+            # Read data
+            if hasattr(stream, 'readAsync'):
+                res = await stream.readAsync()
+            elif iscoroutinefunction(stream.read):
+                res = await stream.read()
+            else:
+                res:Coroutine = await asyncio.to_thread(stream.read)
+        
+        # Handle Void return
+        r = None
+        if self.returnType != Void:
+            # Decode data if not Void
+            r = self.returnType()
+            try:
+                r.unpack(res)
+            except:
+                pass
+        
+        # Call post call if provided
+        if self._post_call:
+            if self.returnType == Void:
+                self._post_call()
+            else:
+                self._post_call(r)
+        self.parent.lock.release()
         return r
     
     def __pre_call__(self, func:Callable[[P], NoReturn]) -> Callable[[P], NoReturn]:
@@ -309,6 +384,7 @@ class CommandManager:
         self._structs:List[Type[BinaryData]] = []
         self._enums:List[Type[Enum]] = []
         self._structs = list(CommandManager._basetypes)
+        self.lock = asyncio.Lock()
         
         @self.command(Int, Int)
         def ping(i:Int) -> Int:
@@ -346,10 +422,19 @@ class CommandManager:
         self._pingcmd(Int(randint(-1000, 1000)))
         return CommandManager._ping
     
+    async def pingAsync(self) -> float:
+        await self._pingcmd.callAsync(Int(randint(-1000, 1000)))
+        return CommandManager._ping
+    
     def apiCheck(self):
         _, h = self.generateAPI()
         hh = self._hashCheck()
-        return h == hh.l
+        return h == hh.l, h, hh.l
+    
+    async def apiCheckAsync(self):
+        _, h = await asyncio.to_thread(self.generateAPI)
+        hh = await self._hashCheck.callAsync()
+        return h == hh.l, h, hh.l
     
     def command(self, paramType:Type[P], returnType:Type[R]):
         id = self._genID()
@@ -569,6 +654,9 @@ class Bool_(BinaryData):
     def __init__(self, b:bool=False):
         super().__init__(b=b)
         self.b:bool
+    
+    def __bool__(self):
+        return self.b
         
 @_basetype('B')
 class Byte(BinaryData):
@@ -576,11 +664,17 @@ class Byte(BinaryData):
         super().__init__(b=b)
         self.b:int
         
+    def __int__(self):
+        return self.b
+        
 @_basetype('h')
 class Short(BinaryData):
     def __init__(self, s:int=0):
         super().__init__(s=s)
         self.s:int
+        
+    def __int__(self):
+        return self.s
         
 @_basetype('H')
 class UShort(BinaryData):
@@ -588,11 +682,17 @@ class UShort(BinaryData):
         super().__init__(s=s)
         self.s:int
         
+    def __int__(self):
+        return self.s
+        
 @_basetype('i')
 class Int(BinaryData):
     def __init__(self, i:int=0):
         super().__init__(i=i)
         self.i:int
+        
+    def __int__(self):
+        return self.i
         
 @_basetype('I')
 class UInt(BinaryData):
@@ -600,11 +700,17 @@ class UInt(BinaryData):
         super().__init__(i=i)
         self.i:int
         
+    def __int__(self):
+        return self.i
+        
 @_basetype('q')
 class Long(BinaryData):
     def __init__(self, l:int=0):
         super().__init__(l=l)
         self.l:int
+        
+    def __int__(self):
+        return self.l
         
 @_basetype('Q')
 class ULong(BinaryData):
@@ -612,9 +718,15 @@ class ULong(BinaryData):
         super().__init__(l=l)
         self.l:int
         
+    def __int__(self):
+        return self.l
+        
 @_basetype('f')
 class Float(BinaryData):
     def __init__(self, f:float=0):
         super().__init__(f=f)
         self.f:float
+        
+    def __float__(self):
+        return self.f
         
