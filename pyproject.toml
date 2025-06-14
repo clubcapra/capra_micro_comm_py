@@ -22,9 +22,11 @@ classifiers = [
 Homepage = "https://github.com/clubcapra/capra_micro_comm_py"
 Issues = "https://github.com/clubcapra/capra_micro_comm_py/issues"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["*"]
+# [tool.setuptools.packages.find]
+# where = ["src"]
+# include = ["*"]
+[tool.setuptools]
+packages = { find = { where = ["src"] } }
 # namespaces = false  # true by default
 [tool.setuptools.package-data]
 capra_micro_comm_py = ["*.h"]
