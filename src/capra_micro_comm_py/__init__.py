@@ -15,8 +15,6 @@ from textwrap import dedent
 import time
 from typing import Callable, Coroutine, ForwardRef, Generic, List, NoReturn, Tuple, Type, TypeVar, Union, ClassVar, overload
 
-from serial import Serial
-
 BinaryType = Union[int, float, bool]
 
 TYPE_MAP = {
@@ -612,37 +610,37 @@ def _basetype(fmt:str):
     return _addtype(fmt, CommandManager._basetypes)
     
 
-class SerialCommandManager(CommandManager):
-    def __init__(self, port:str = None, baud:int=9600):
-        super().__init__()
-        self._stream = Serial()
-        self._encoder = Base64(self._stream)
-        self._stream.port = port
-        self._stream.baudrate = baud
+# class SerialCommandManager(CommandManager):
+#     def __init__(self, port:str = None, baud:int=9600):
+#         super().__init__()
+#         self._stream = Serial()
+#         self._encoder = Base64(self._stream)
+#         self._stream.port = port
+#         self._stream.baudrate = baud
 
-    @property
-    def port(self) -> str:
-        return self._stream.port
+#     @property
+#     def port(self) -> str:
+#         return self._stream.port
     
-    @port.setter
-    def port(self, p:str):
-        self._stream.port = p
+#     @port.setter
+#     def port(self, p:str):
+#         self._stream.port = p
     
-    @property
-    def baud(self) -> int:
-        return self._stream.baudrate
+#     @property
+#     def baud(self) -> int:
+#         return self._stream.baudrate
     
-    @port.setter
-    def baud(self, b:int):
-        self._stream.baudrate = b
+#     @port.setter
+#     def baud(self, b:int):
+#         self._stream.baudrate = b
     
-    def __enter__(self) -> IOBase:
-        if not self._stream.is_open:
-            self._stream.open()
-        return self._encoder
+#     def __enter__(self) -> IOBase:
+#         if not self._stream.is_open:
+#             self._stream.open()
+#         return self._encoder
         
-    def __exit__(self, *args, **kwargs):
-        self._stream.flush()
+#     def __exit__(self, *args, **kwargs):
+#         self._stream.flush()
         
 @_basetype('x')
 class Void(BinaryData):
