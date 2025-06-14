@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "capra_micro_comm_py"
+name = "capra-micro-comm-py"
 version = "1.2.1"
 authors = [
   { name="CAPRA", email="capra@ens.etsmtl.ca" },
