@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "capra_micro_comm_py"
-version = "1.2.0"
+version = "1.2.1"
 authors = [
   { name="CAPRA", email="capra@ens.etsmtl.ca" },
 ]
 description = "A lightweight and framework independant rpc library."
 readme = "ReadMe.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",

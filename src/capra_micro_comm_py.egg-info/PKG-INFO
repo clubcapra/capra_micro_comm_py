@@ -1,6 +1,6 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: capra_micro_comm_py
-Version: 1.2.0
+Version: 1.2.1
 Summary: A lightweight and framework independant rpc library.
 Author-email: CAPRA <capra@ens.etsmtl.ca>
 Project-URL: Homepage, https://github.com/clubcapra/capra_micro_comm_py
@@ -8,9 +8,10 @@ Project-URL: Issues, https://github.com/clubcapra/capra_micro_comm_py/issues
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
-Requires-Python: >=3.8
+Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Dynamic: license-file
 
 # capra_micro_comm_py
 
